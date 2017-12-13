@@ -347,7 +347,17 @@ namespace kurs_l_spovm {
 					}
 				}
 				if (currentList.size() < permanentList.size()) permanentList = currentList; //обновить список внутренних устройств если оказалось что одно из первоначальноподключенных - не внутреннее
-					prevList = currentList;
+				for (int i = 0; i < prevList.size(); i++)
+				{
+					for (int j = 0; j < currentList.size(); j++)					
+						if (prevList[i] == currentList[j])
+						{
+							bool tempCurrentlyAdded = currentList[j].currentlyAdded;
+							currentList[j] = prevList[i];
+							currentList[j].currentlyAdded = tempCurrentlyAdded;
+						}
+				}
+				prevList = currentList;
 				ListDevices();		
 				
 			}
@@ -389,10 +399,11 @@ private: System::Void button5_Click(System::Object^  sender, System::EventArgs^ 
 				 "Free logical space: "+ Convert::ToString(storageList[listBox2->SelectedIndex].freeLogicalSpace.QuadPart) + " bytes\n" +
 				 "Used logical space: "+ Convert::ToString(storageList[listBox2->SelectedIndex].usedLogicalSpace.QuadPart) + " bytes\n" +
 				 "Interface: " + gcnew String(storageList[listBox2->SelectedIndex].connectingInterface.c_str()) +
-				 "ATA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata         \n")? "1": "1-7") + "\n" +					
+				 "ATA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata         \n")? "1": "1-7") + "\n" +						 
 				 "Firmware: "+ gcnew String(storageList[listBox2->SelectedIndex].firmware) + "\n" +
 				 "Serial Number: "+ gcnew String(storageList[listBox2->SelectedIndex].serialNumber) + "\n" +
 				 "Version: "+ gcnew String(storageList[listBox2->SelectedIndex].version) + "\n" +
+				 "Using DMA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata         \n") && storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Ata          \n")? false: true) + "\n" +		
 				 "Using PIO: " + storageList[listBox2->SelectedIndex].usingPIO
 			 );
 		 }

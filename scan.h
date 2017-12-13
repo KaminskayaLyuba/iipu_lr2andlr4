@@ -27,10 +27,10 @@ public:
 	std::wstring deviceDesc;																//описание устройства
 	std::wstring deviceEnum;																//перечислитель устройства													
 	std::wstring deviceProducer;															//производитель устройства
-	bool available;
-	bool removable;
-	bool ejectSupported;																		
-	int deviceNumber;																		
+	bool available;																			//доступность устройства
+	bool removable;																			//внешние уст-ва
+	bool ejectSupported;																	//поддержка извлечения
+	int deviceNumber;																		//номер устройства
 	DEVINST deviceInst;																		//структура по которой к устройству можно получить доступ в системе
 	bool currentlyAdded;																	//метка о том что устройство свежедобавленное
 	char driveLetter;																		//буква устройства если есть
@@ -66,7 +66,7 @@ public:
 std::vector<DeviceInfo> GetUSBDevices()														//получение USB-устройств
 {
 
-	std::vector<DeviceInfo> result;
+	std::vector<DeviceInfo> result;															//итоговый список устройств
 
 
 	const GUID* guid = &GUID_DEVINTERFACE_DISK;												//семейство системных имен
@@ -75,28 +75,28 @@ std::vector<DeviceInfo> GetUSBDevices()														//получение USB-устройств
 	HDEVINFO hDevInfo = SetupDiGetClassDevs(guid, L"USB", NULL, DIGCF_PRESENT|DIGCF_ALLCLASSES);		//получаем хендл на выборку устройств по guid содержащих слово USB, сейчас находящихся в системе, всех классов
 
 
-	DWORD dwIndex = 0;
-	long res = 1;
+	DWORD dwIndex = 0;																		//индекс устройств в выборке
+	long res = 1;																			//результат работы функций
 
 	BYTE Buf[1024];																			//строка, в которую возвращается ответ от системы
 	PSP_DEVICE_INTERFACE_DETAIL_DATA pspdidd = (PSP_DEVICE_INTERFACE_DETAIL_DATA)Buf;		//структура. в которой лежит детальная информация по интерфейсом устройства
 	SP_DEVICE_INTERFACE_DATA         spdid;													//данные об интерфейсе
 	SP_DEVINFO_DATA                  spdd;													//данные об устройстве
 	spdd.cbSize = sizeof(SP_DEVINFO_DATA); 
-	DWORD                            dwSize;
+	DWORD                            dwSize;												//размер данны=х который вернула функция
 	spdid.cbSize = sizeof(spdid);
 
 	
 	while(true){
 
-			spdid.cbSize = sizeof(spdid);
+			spdid.cbSize = sizeof(spdid);													
 			if (!SetupDiEnumDeviceInfo(hDevInfo, dwIndex, &spdd))							//если список устройст кончился - выйти
 			{
 				break;
 			}
 			dwIndex++;
 
-			DWORD dwBytesReturned = 0;
+			DWORD dwBytesReturned = 0;														
 			DeviceInfo info;
 			DWORD propType = 0;
 			DWORD requiredSize = 0;
@@ -118,12 +118,12 @@ std::vector<DeviceInfo> GetUSBDevices()														//получение USB-устройств
 			SetupDiGetDeviceRegistryProperty(hDevInfo, &spdd, SPDRP_DEVICEDESC, &propType, (BYTE*)propBuffer, 512, &requiredSize);
 			info.deviceDesc = propBuffer;
 			DWORD flags = 0;
-			SetupDiGetDeviceRegistryProperty(hDevInfo, &spdd, SPDRP_CAPABILITIES , &propType, (BYTE*)&flags, 512, &requiredSize);
-			info.ejectSupported = true; 
+			//SetupDiGetDeviceRegistryProperty(hDevInfo, &spdd, SPDRP_CAPABILITIES , &propType, (BYTE*)&flags, 512, &requiredSize);
+			info.ejectSupported = true;														
 			info.removable = true;
 			info.currentlyAdded = false;
-			info.driveLetter = '/';
-			ULARGE_INTEGER zero;
+			info.driveLetter = '/';															//буква диска
+			ULARGE_INTEGER zero;															//константный ноль для инициализации всех размеров
 			zero.QuadPart = 0;
 			info.freeLogicalSpace = zero;
 			info.totalLogicalSpace = zero;
@@ -150,12 +150,12 @@ BOOL EjectDevice(DeviceInfo& info)
 {
 	if(info.ejectSupported)																	//если устройство можно отклчить
 	{
-		DEVINST DevInst = info.deviceInst;
+		DEVINST DevInst = info.deviceInst;													
 
-		PNP_VETO_TYPE VetoType = PNP_VetoTypeUnknown;			
-		WCHAR VetoNameW[MAX_PATH];
-		VetoNameW[0] = 0;
-		bool bSuccess = false;
+		PNP_VETO_TYPE VetoType = PNP_VetoTypeUnknown;										//неопределенный тип устройств
+		WCHAR VetoNameW[MAX_PATH];															//имя типа устройств
+		VetoNameW[0] = 0;																	
+		bool bSuccess = false;																//успешность выполнения функции
 
 		DEVINST DevInstParent = 0;															//родитель устройства
 		DWORD res = CM_Get_Parent(&DevInstParent, DevInst, 0);								//получаем родителя устройства
@@ -243,32 +243,32 @@ string getBus(DWORD buffer)														//перевод типа интерфейса из числа в ст
 //
 std::vector<StorageInfo> getStorages()																
 {
-	std::vector<StorageInfo> currentList;
-	HDEVINFO hDeinfo;
-	BYTE Buf[1024];
-	SP_DEVICE_INTERFACE_DATA dataDeviceInterface;
-	PSP_DEVICE_INTERFACE_DETAIL_DATA interfaceDetailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)Buf;
-	SP_DEVINFO_DATA infoData;
-	SP_DEVINFO_DATA deviceInfoData;
-	DISK_GEOMETRY_EX diskGeometry;
-	DWORD sizeDeviceDetail = 0;
-	DWORD bufferSize = 0;
-	STORAGE_PROPERTY_QUERY storagePropertyQuery;
-	STORAGE_PROPERTY_QUERY adapterPropertyQuery;
-	STORAGE_ADAPTER_DESCRIPTOR storageAdapterDescriptor;
-	LPTSTR propertyBuffer = NULL;
-	DWORD propertySize = 0; 
-	STORAGE_DESCRIPTOR_HEADER storageDescriptorHeader = { 0 };
+	std::vector<StorageInfo> currentList;																//текущий список запоминающих устройств для сохранения
+	HDEVINFO hDeinfo;																					//дескриптор информации об устройстве
+	BYTE Buf[1024];																						//буфер для возвращаемых данных
+	SP_DEVICE_INTERFACE_DATA dataDeviceInterface;														//информация об интерфейсе
+	PSP_DEVICE_INTERFACE_DETAIL_DATA interfaceDetailData = (PSP_DEVICE_INTERFACE_DETAIL_DATA)Buf;		//детализированая информация об интефейсе
+	SP_DEVINFO_DATA infoData;																			
+	SP_DEVINFO_DATA deviceInfoData;																		
+	DISK_GEOMETRY_EX diskGeometry;																		//геометрия диска
+	DWORD sizeDeviceDetail = 0;																			//размер детализированой информации об интефейсе
+	DWORD bufferSize = 0;																				//размер возвращаемого буфера
+	STORAGE_PROPERTY_QUERY storagePropertyQuery;														//запрос свойств запоминающего устройства
+	STORAGE_PROPERTY_QUERY adapterPropertyQuery;														//запрос свойств интерфейса
+	STORAGE_ADAPTER_DESCRIPTOR storageAdapterDescriptor;												//дескриптор адаптера запоминающего устройства (используется для получения доступности PIO)
+	LPTSTR propertyBuffer = NULL;																		//возвращаемый буфер для свойств
+	DWORD propertySize = 0;																				
+	STORAGE_DESCRIPTOR_HEADER storageDescriptorHeader = { 0 };											
 	DWORD dwBytesReturned = 0;
-	CString strSerialNumber;
-	CString strVersion;
-	CString strWar;
-	DWORD dwSerialNumberOffset;
-	DWORD vers;
-	DWORD firmWare;
-	ULARGE_INTEGER freeSpace, totalSpace, junk, totalFreeSpace, totalAllSpace;
-	char disks[256];
-	char *disk;
+	CString strSerialNumber;																			//строка с серийным номером
+	CString strVersion;																					//строка с версией
+	CString strWar;																						//строка с прошивкой
+	DWORD dwSerialNumberOffset;																			//смещение для серийного номера
+	DWORD vers;																							//смещение для версии
+	DWORD firmWare;																						//смещение для прошивки
+	ULARGE_INTEGER freeSpace, totalSpace, junk, totalFreeSpace, totalAllSpace;							//переменные для размеров диска
+	char disks[256];																					//список всех дисков
+	char *disk;																							//указатель на текущую букву диска
 	DWORD sizebuf = 256;
 
 	totalFreeSpace.QuadPart = 0;
@@ -277,11 +277,11 @@ std::vector<StorageInfo> getStorages()
 	dataDeviceInterface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
 	deviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
 
-	ZeroMemory(&storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY));
-	storagePropertyQuery.PropertyId = StorageDeviceProperty;
-	storagePropertyQuery.QueryType = PropertyStandardQuery;
+	ZeroMemory(&storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY));									//обнуление структуры
+	storagePropertyQuery.PropertyId = StorageDeviceProperty;											//запрос на информацию об устройстве
+	storagePropertyQuery.QueryType = PropertyStandardQuery;												//тип запроса не расширенный (стандартный)
 	ZeroMemory(&adapterPropertyQuery, sizeof(STORAGE_PROPERTY_QUERY));
-	adapterPropertyQuery.PropertyId = StorageAdapterProperty;
+	adapterPropertyQuery.PropertyId = StorageAdapterProperty;											//запрос на информацию об адаптере
 	adapterPropertyQuery.QueryType = PropertyStandardQuery;
 
 	hDeinfo = SetupDiGetClassDevs(&GUID_DEVINTERFACE_DISK, NULL, 0, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);					//получить список устройств по этму гуиду с параметрами инерфейс и есть сейчас в системе
@@ -302,14 +302,14 @@ std::vector<StorageInfo> getStorages()
 			HANDLE hDrive = CreateFile(interfaceDetailData->DevicePath, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);		//получаю хендл на диск
 			
 			
-			DeviceIoControl(hDrive, IOCTL_STORAGE_QUERY_PROPERTY,								//полчаю данные об устройстве
+			DeviceIoControl(hDrive, IOCTL_STORAGE_QUERY_PROPERTY,								//полчаю размер данных об устройстве
 				&storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY),
 				&storageDescriptorHeader, sizeof(STORAGE_DESCRIPTOR_HEADER),
 				&dwBytesReturned, NULL);
 			const DWORD dwOutBufferSize = storageDescriptorHeader.Size;
 			BYTE* pOutBuffer = new BYTE[dwOutBufferSize];
 			ZeroMemory(pOutBuffer, dwOutBufferSize);
-			DeviceIoControl(hDrive, IOCTL_STORAGE_QUERY_PROPERTY,
+			DeviceIoControl(hDrive, IOCTL_STORAGE_QUERY_PROPERTY,								//получаю данные о запоминающем устройстве
 				&storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY),
 				pOutBuffer, dwOutBufferSize,
 				&dwBytesReturned, NULL);
@@ -343,7 +343,7 @@ std::vector<StorageInfo> getStorages()
 					if (GetDriveType((LPTSTR)disk) == DRIVE_REMOVABLE)							//если диск относится к извлекаемым
 					{
 						for (int t = 0; t < prevList.size(); t++)								//проверить чтобы он никому не был назначен
-							if (prevList[t].driveLetter == (wchar_t)disk) removable = true;
+							if (prevList[t].driveLetter == disk[0]) removable = true;
 						if (!removable)															//если не назначен, то найти свежедобавленное устройство и связать с диском
 							for (int t = 0; t < prevList.size(); t++)
 								if (prevList[t].currentlyAdded == true)
@@ -352,6 +352,7 @@ std::vector<StorageInfo> getStorages()
 									prevList[t].totalLogicalSpace.QuadPart = totalSpace.QuadPart;
 									prevList[t].freeLogicalSpace.QuadPart = freeSpace.QuadPart;
 									prevList[t].usedLogicalSpace.QuadPart = prevList[t].totalLogicalSpace.QuadPart - prevList[t].freeLogicalSpace.QuadPart;
+									prevList[t].currentlyAdded = false;
 								}
 					}
 					else																		//если устройство неизвлекаемое, то добавить объем диска к текущему объему винчестера
