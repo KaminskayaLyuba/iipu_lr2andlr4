@@ -392,21 +392,36 @@ private: System::Void button3_Click(System::Object^  sender, System::EventArgs^ 
 				 "Drive letter: " + Char(prevList[listBox1->SelectedIndex].driveLetter)
  			 );
 		 }
-private: System::Void button5_Click(System::Object^  sender, System::EventArgs^  e) {	// вывести инфформацию о винчестере
-			 System::Windows::Forms::MessageBox::Show("Physical space: " +
-				 Convert::ToString( storageList[listBox2->SelectedIndex].totalPhysicalSpace.QuadPart) + " bytes\n" +
-				 "Logical space: "+ Convert::ToString(storageList[listBox2->SelectedIndex].totalLogicalSpace.QuadPart) + " bytes\n" +
-				 "Free logical space: "+ Convert::ToString(storageList[listBox2->SelectedIndex].freeLogicalSpace.QuadPart) + " bytes\n" +
-				 "Used logical space: "+ Convert::ToString(storageList[listBox2->SelectedIndex].usedLogicalSpace.QuadPart) + " bytes\n" +
-				 "Interface: " + gcnew String(storageList[listBox2->SelectedIndex].connectingInterface.c_str()) +
-				 "ATA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata         \n")? "1": "1-7") + "\n" +						 
-				 "Firmware: "+ gcnew String(storageList[listBox2->SelectedIndex].firmware) + "\n" +
-				 "Serial Number: "+ gcnew String(storageList[listBox2->SelectedIndex].serialNumber) + "\n" +
-				 "Version: "+ gcnew String(storageList[listBox2->SelectedIndex].version) + "\n" +
-				 "Using DMA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata         \n") && storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Ata          \n")? false: true) + "\n" +		
-				 "Using PIO: " + storageList[listBox2->SelectedIndex].usingPIO
-			 );
-		 }
+private: System::Void button5_Click(System::Object^ sender, System::EventArgs^ e) { // вывести инфформацию о винчестере 
+			System::Windows::Forms::MessageBox::Show("Physical space: " + 
+				Convert::ToString(storageList[listBox2->SelectedIndex].totalPhysicalSpace.QuadPart) + " bytes\n" + 
+				"Logical space: " + Convert::ToString(storageList[listBox2->SelectedIndex].totalLogicalSpace.QuadPart) + " bytes\n" + 
+				"Free logical space: " + Convert::ToString(storageList[listBox2->SelectedIndex].freeLogicalSpace.QuadPart) + " bytes\n" + 
+				"Used logical space: " + Convert::ToString(storageList[listBox2->SelectedIndex].usedLogicalSpace.QuadPart) + " bytes\n" + 
+				"Interface: " + gcnew String(storageList[listBox2->SelectedIndex].connectingInterface.c_str()) + 
+				"ATA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata \n") ? "1" : "1-7") + "\n" + 
+				"Firmware: " + gcnew String(storageList[listBox2->SelectedIndex].firmware) + "\n" + 
+				"Serial Number: " + gcnew String(storageList[listBox2->SelectedIndex].serialNumber) + "\n" + 
+				"Version: " + gcnew String(storageList[listBox2->SelectedIndex].version) + "\n" + 
+				"Using DMA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata \n") && storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Ata \n") ? "False" : addingDMA()) + "\n" + 
+				"Using PIO: " + addingPIO(storageList[listBox2->SelectedIndex].usingPIO) 
+); 
+} 
+
+System::String^ addingPIO(bool adding) 
+{ 
+	if (!adding) 
+		return "False"; 
+	else 
+	return gcnew String("PIO Mode 0\n" + "PIO Mode 1\n" + "PIO Mode 2\n" + "PIO Mode 3\n" + "PIO Mode 4\n"); 
+} 
+
+String^ addingDMA() 
+{ 
+	return gcnew String("SW DMA Mode 0\n" + "SW DMA Mode 1\n" + "SW DMA Mode 2\n" + "MW DMA Mode 0\n" + "MW DMA Mode 1\n" + "MW DMA Mode 2\n" + 
+"UDMA Mode 0\n" + "UDMA Mode 1\n" + "UDMA Mode 2\n" + "UDMA Mode 3\n" + "UDMA Mode 4\n" + "UDMA Mode 5\n" + "UDMA Mode 6\n"); 
+}
+		
 private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e) {	//остановить или запустить сканирование
 			 scanPaused = !scanPaused;
 			 button4->BackColor = scanPaused?Color::Red:Color::Green;
