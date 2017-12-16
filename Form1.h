@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "scan.h"
 
 // Scan interval
@@ -17,7 +17,7 @@ namespace kurs_l_spovm {
 	using namespace System::Threading;
 
 	/// <summary>
-	/// Сводка для Form1
+	/// РЎРІРѕРґРєР° РґР»СЏ Form1
 	/// </summary>
 	public ref class Form1 : public System::Windows::Forms::Form
 	{
@@ -26,20 +26,21 @@ namespace kurs_l_spovm {
 		{
 			InitializeComponent();
 			//
-			//TODO: добавьте код конструктора
+			//TODO: РґРѕР±Р°РІСЊС‚Рµ РєРѕРґ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР°
 			//		
-			ListDevices();																	//создание списка USB-устройств
-			ListStorages();																	//создание списка запоминающих устройств
-			listBox1->SelectedIndex = 0;
+			ListDevices();																	//СЃРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° USB-СѓСЃС‚СЂРѕР№СЃС‚РІ
+			ListStorages();																	//СЃРѕР·РґР°РЅРёРµ СЃРїРёСЃРєР° Р·Р°РїРѕРјРёРЅР°СЋС‰РёС… СѓСЃС‚СЂРѕР№СЃС‚РІ
+			if (listBox1->Items->Count>0)
+				listBox1->SelectedIndex = 0;
 			listBox2->SelectedIndex = 0;
-			button4->BackColor = scanPaused?Color::Red:Color::Green;						//цвет кнопки если запущено или остановлено сканирование
-			timer1->Interval = SCAN_DELAY;													//установка интервала таймера
-			timer1->Start();																//запуск таймера
+			button4->BackColor = scanPaused?Color::Red:Color::Green;						//С†РІРµС‚ РєРЅРѕРїРєРё РµСЃР»Рё Р·Р°РїСѓС‰РµРЅРѕ РёР»Рё РѕСЃС‚Р°РЅРѕРІР»РµРЅРѕ СЃРєР°РЅРёСЂРѕРІР°РЅРёРµ
+			timer1->Interval = SCAN_DELAY;													//СѓСЃС‚Р°РЅРѕРІРєР° РёРЅС‚РµСЂРІР°Р»Р° С‚Р°Р№РјРµСЂР°
+			timer1->Start();																//Р·Р°РїСѓСЃРє С‚Р°Р№РјРµСЂР°
 		}
 
 	protected:
 		/// <summary>
-		/// Освободить все используемые ресурсы.
+		/// РћСЃРІРѕР±РѕРґРёС‚СЊ РІСЃРµ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ СЂРµСЃСѓСЂСЃС‹.
 		/// </summary>
 		~Form1()
 		{
@@ -63,7 +64,7 @@ namespace kurs_l_spovm {
 	protected: 
 	private: System::Windows::Forms::ListBox^  listBox1;
 			 
-	protected:  template<class T> bool Contains(std::vector<T>& vector, T value)			//проверка на наличие объекта в векторе
+	protected:  template<class T> bool Contains(std::vector<T>& vector, T value)			//РїСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ РѕР±СЉРµРєС‚Р° РІ РІРµРєС‚РѕСЂРµ
 	{
 	for(int i = 0; i < vector.size(); i++)
 		if(vector[i] == value)
@@ -79,14 +80,14 @@ namespace kurs_l_spovm {
 
 	private:
 		/// <summary>
-		/// Требуется переменная конструктора.
+		/// РўСЂРµР±СѓРµС‚СЃСЏ РїРµСЂРµРјРµРЅРЅР°СЏ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР°.
 		/// </summary>
 
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
-		/// Обязательный метод для поддержки конструктора - не изменяйте
-		/// содержимое данного метода при помощи редактора кода.
+		/// РћР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ РјРµС‚РѕРґ РґР»СЏ РїРѕРґРґРµСЂР¶РєРё РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР° - РЅРµ РёР·РјРµРЅСЏР№С‚Рµ
+		/// СЃРѕРґРµСЂР¶РёРјРѕРµ РґР°РЅРЅРѕРіРѕ РјРµС‚РѕРґР° РїСЂРё РїРѕРјРѕС‰Рё СЂРµРґР°РєС‚РѕСЂР° РєРѕРґР°.
 		/// </summary>
 		void InitializeComponent(void)
 		{
@@ -273,46 +274,51 @@ namespace kurs_l_spovm {
 		}
 #pragma endregion
 		
-	private: void ListDevices()																//вывод списка USB-устройств
+	private: void ListDevices()																//РІС‹РІРѕРґ СЃРїРёСЃРєР° USB-СѓСЃС‚СЂРѕР№СЃС‚РІ
 	{
 		listBox1->Items->Clear();
-		if(prevList.size() == 0)
+		if (prevList.size() == 0)
 		{
-			listBox1->Items->Add("No USB devices connected.");								//если нет подключеных USB-устройств
+			listBox1->Items->Add("No USB devices connected.");								//ГҐГ±Г«ГЁ Г­ГҐГІ ГЇГ®Г¤ГЄГ«ГѕГ·ГҐГ­Г»Гµ USB-ГіГ±ГІГ°Г®Г©Г±ГІГў
 		}
-		for(int i = 0; i < prevList.size(); i++)
-		{	
-			listBox1->Items->Add(gcnew String(prevList[i].deviceDesc.c_str()) + (Contains(permanentList, prevList[i]) ? "[Internal]" : "[External]"));	//добавление усб устройства в список усб устройств
+		for (int i = 0; i < prevList.size(); i++)
+		{
+			if (!(Contains(permanentList, prevList[i])))
+			{
+				prevList[i].deviceNumber = listBox1->Items->Count;
+				listBox1->Items->Add(gcnew String(prevList[i].deviceDesc.c_str()));	//Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГҐ ГіГ±ГЎ ГіГ±ГІГ°Г®Г©Г±ГІГўГ  Гў Г±ГЇГЁГ±Г®ГЄ ГіГ±ГЎ ГіГ±ГІГ°Г®Г©Г±ГІГў
+			}
 		}
-		listBox1->SelectedIndex = 0;
+		if (listBox1->Items->Count>0)
+			listBox1->SelectedIndex = 0;
 
 	}
 
-	private: void ListStorages()															//получение и вывод списка запоминающих устройств
+	private: void ListStorages()															//РїРѕР»СѓС‡РµРЅРёРµ Рё РІС‹РІРѕРґ СЃРїРёСЃРєР° Р·Р°РїРѕРјРёРЅР°СЋС‰РёС… СѓСЃС‚СЂРѕР№СЃС‚РІ
 	{
 		int prevSelectedIndex = listBox2->SelectedIndex;
-		storageList.clear();																//очистка списка запоминающих устройств
+		storageList.clear();																//РѕС‡РёСЃС‚РєР° СЃРїРёСЃРєР° Р·Р°РїРѕРјРёРЅР°СЋС‰РёС… СѓСЃС‚СЂРѕР№СЃС‚РІ
 		listBox2->Items->Clear();
-		storageList=getStorages();															//получение списка запоминающих устройств
+		storageList=getStorages();															//РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° Р·Р°РїРѕРјРёРЅР°СЋС‰РёС… СѓСЃС‚СЂРѕР№СЃС‚РІ
 		
 		if(storageList.size() == 0)
 		{
-			listBox2->Items->Add("No storage devices found.");								//если нет подключенных запоминающих устройств
+			listBox2->Items->Add("No storage devices found.");								//РµСЃР»Рё РЅРµС‚ РїРѕРґРєР»СЋС‡РµРЅРЅС‹С… Р·Р°РїРѕРјРёРЅР°СЋС‰РёС… СѓСЃС‚СЂРѕР№СЃС‚РІ
 		}
 		for(int i = 0; i < storageList.size(); i++)
 		{			
-			listBox2->Items->Add(String::Concat(gcnew String("Device "),Convert::ToString(i+1),": ",gcnew String(storageList[i].version))); //добавить устройство в списокк запоминающих
+			listBox2->Items->Add(String::Concat(gcnew String("Device "),Convert::ToString(i+1),": ",gcnew String(storageList[i].version))); //РґРѕР±Р°РІРёС‚СЊ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РІ СЃРїРёСЃРѕРєРє Р·Р°РїРѕРјРёРЅР°СЋС‰РёС…
 		}
 		listBox2->SelectedIndex = prevSelectedIndex < listBox2->Items->Count ? prevSelectedIndex : 0;
 	}
 
-	private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e)		//таймер в отдельном потоке для сканирования
+	private: System::Void timer1_Tick(System::Object^  sender, System::EventArgs^  e)		//С‚Р°Р№РјРµСЂ РІ РѕС‚РґРµР»СЊРЅРѕРј РїРѕС‚РѕРєРµ РґР»СЏ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ
 	{
 		if( !scanPaused ){
-			std::vector<DeviceInfo> currentList = GetUSBDevices();	// текущий список устройств
+			std::vector<DeviceInfo> currentList = GetUSBDevices();	// С‚РµРєСѓС‰РёР№ СЃРїРёСЃРѕРє СѓСЃС‚СЂРѕР№СЃС‚РІ
 			bool needToCheck = false;
 
-			// поиск новых устройств
+			// РїРѕРёСЃРє РЅРѕРІС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ
 			if(currentList.size()!=prevList.size())
 				needToCheck = true;
 			else
@@ -322,23 +328,23 @@ namespace kurs_l_spovm {
 						needToCheck = true;
 						break;
 					}
-			if (needToCheck)	// если список надо перепроверить
+			if (needToCheck)	// РµСЃР»Рё СЃРїРёСЃРѕРє РЅР°РґРѕ РїРµСЂРµРїСЂРѕРІРµСЂРёС‚СЊ
 			{
 				for(int i = 0; i < currentList.size(); i++){
-					if( !Contains(prevList, currentList[i] ) ){	//если устройство было добавлено вывести лейбл на экран
-						currentList[i].currentlyAdded = true;	//пометить как свежедобавленное
+					if( !Contains(prevList, currentList[i] ) ){	//РµСЃР»Рё СѓСЃС‚СЂРѕР№СЃС‚РІРѕ Р±С‹Р»Рѕ РґРѕР±Р°РІР»РµРЅРѕ РІС‹РІРµСЃС‚Рё Р»РµР№Р±Р» РЅР° СЌРєСЂР°РЅ
+						currentList[i].currentlyAdded = true;	//РїРѕРјРµС‚РёС‚СЊ РєР°Рє СЃРІРµР¶РµРґРѕР±Р°РІР»РµРЅРЅРѕРµ
 						label1->Text = String::Concat(gcnew String("The device has been connected:\n Name: ") ,gcnew String(currentList[i].deviceDesc.c_str()) ,gcnew String("\nPath:\n") ,gcnew String(currentList[i].deviceObjectName.c_str()));
 						label1->BackColor = Color::Green;
 						label1->Visible = true;
 						label2->Visible = false;
 					}
 					else
-						currentList[i].currentlyAdded = false; //иначе пометить как не свежедобавленное
+						currentList[i].currentlyAdded = false; //РёРЅР°С‡Рµ РїРѕРјРµС‚РёС‚СЊ РєР°Рє РЅРµ СЃРІРµР¶РµРґРѕР±Р°РІР»РµРЅРЅРѕРµ
 				}
 
-			// поиск удаленных устройств
+			// РїРѕРёСЃРє СѓРґР°Р»РµРЅРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ
 				for(int i = 0; i < prevList.size(); i++){
-					if( !Contains(currentList, prevList[i] ) ){	//если устройство исчесло из списка вывести на экран что устройство было удалено	
+					if( !Contains(currentList, prevList[i] ) ){	//РµСЃР»Рё СѓСЃС‚СЂРѕР№СЃС‚РІРѕ РёСЃС‡РµСЃР»Рѕ РёР· СЃРїРёСЃРєР° РІС‹РІРµСЃС‚Рё РЅР° СЌРєСЂР°РЅ С‡С‚Рѕ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ Р±С‹Р»Рѕ СѓРґР°Р»РµРЅРѕ	
 						label2->Text = String::Concat(gcnew String("The device has been removed:\n Name: ") ,gcnew String(prevList[i].deviceDesc.c_str()) ,gcnew String("\nPath:\n") ,gcnew String(prevList[i].deviceObjectName.c_str()));
 						label2->BackColor = Color::Red;
 						label2->Visible = true;
@@ -346,7 +352,7 @@ namespace kurs_l_spovm {
 					
 					}
 				}
-				if (currentList.size() < permanentList.size()) permanentList = currentList; //обновить список внутренних устройств если оказалось что одно из первоначальноподключенных - не внутреннее
+				if (currentList.size() < permanentList.size()) permanentList = currentList; //РѕР±РЅРѕРІРёС‚СЊ СЃРїРёСЃРѕРє РІРЅСѓС‚СЂРµРЅРЅРёС… СѓСЃС‚СЂРѕР№СЃС‚РІ РµСЃР»Рё РѕРєР°Р·Р°Р»РѕСЃСЊ С‡С‚Рѕ РѕРґРЅРѕ РёР· РїРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅРѕРїРѕРґРєР»СЋС‡РµРЅРЅС‹С… - РЅРµ РІРЅСѓС‚СЂРµРЅРЅРµРµ
 				for (int i = 0; i < prevList.size(); i++)
 				{
 					for (int j = 0; j < currentList.size(); j++)					
@@ -364,8 +370,8 @@ namespace kurs_l_spovm {
 			ListStorages();
 		}
 			 }
-	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {	//кнопка безопасно извлечения
-				 if(EjectDevice(prevList[listBox1->SelectedIndex]))	System::Windows::Forms::MessageBox::Show("Can't eject for "+System::Convert::ToString(ejectCount)+" times");					
+	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {	//РєРЅРѕРїРєР° Р±РµР·РѕРїР°СЃРЅРѕ РёР·РІР»РµС‡РµРЅРёСЏ
+		if (EjectDevice(prevList[prevLisItemPosition(listBox1->SelectedIndex)]))	System::Windows::Forms::MessageBox::Show("Can't eject for "+System::Convert::ToString(ejectCount)+" times");
 				 else  
 				 {
 					 System::Windows::Forms::MessageBox::Show("Device "+listBox1->SelectedItem+" succesfuly ejected");
@@ -373,56 +379,49 @@ namespace kurs_l_spovm {
 					 ListStorages();
 				 }
 			 }
-private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {	//изменение количества попыток извлечения
+private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {	//РёР·РјРµРЅРµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РїРѕРїС‹С‚РѕРє РёР·РІР»РµС‡РµРЅРёСЏ
 			 ejectCount = System::Convert::ToInt32(textBox1->Text)>0?System::Convert::ToInt32(textBox1->Text):3;
 			 textBox1->Clear();
 			 label4->Text = String::Concat(gcnew String("Current EAC: "), System::Convert::ToString(ejectCount));
 		 }
-private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {	//вывести информацию о усб
-			 System::Windows::Forms::MessageBox::Show("Device description: " +
-				 gcnew String(prevList[listBox1->SelectedIndex].deviceDesc.c_str()) + "\n" +
-				 "Device enumerator: "+ gcnew String(prevList[listBox1->SelectedIndex].deviceEnum.c_str()) + "\n" +
-				 "Device friendly name: "+ gcnew String(prevList[listBox1->SelectedIndex].deviceFriendlyName.c_str()) + "\n" +
-				 "Hardware ID: "+ gcnew String(prevList[listBox1->SelectedIndex].deviceHardwareId.c_str()) + "\n" +
-				 "Device object name: "+ gcnew String(prevList[listBox1->SelectedIndex].deviceObjectName.c_str()) + "\n" +
-				 "Device producer: "+ gcnew String(prevList[listBox1->SelectedIndex].deviceProducer.c_str()) + "\n"  +
-				 "Logical space: " + Convert::ToString(prevList[listBox1->SelectedIndex].totalLogicalSpace.QuadPart) + " bytes\n" +
-				 "Free logical space: " + Convert::ToString(prevList[listBox1->SelectedIndex].freeLogicalSpace.QuadPart) + " bytes\n" +
-				 "Used logical space: " + Convert::ToString(prevList[listBox1->SelectedIndex].usedLogicalSpace.QuadPart) + " bytes\n" +
-				 "Drive letter: " + Char(prevList[listBox1->SelectedIndex].driveLetter)
- 			 );
+private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {	//РІС‹РІРµСЃС‚Рё РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ СѓСЃР±
+	System::Windows::Forms::MessageBox::Show("Device description: " +
+		gcnew String(prevList[prevLisItemPosition(listBox1->SelectedIndex)].deviceDesc.c_str()) + "\n" +
+		"Device enumerator: " + gcnew String(prevList[prevLisItemPosition(listBox1->SelectedIndex)].deviceEnum.c_str()) + "\n" +
+		"Device friendly name: " + gcnew String(prevList[prevLisItemPosition(listBox1->SelectedIndex)].deviceFriendlyName.c_str()) + "\n" +
+		"Hardware ID: " + gcnew String(prevList[prevLisItemPosition(listBox1->SelectedIndex)].deviceHardwareId.c_str()) + "\n" +
+		"Device object name: " + gcnew String(prevList[prevLisItemPosition(listBox1->SelectedIndex)].deviceObjectName.c_str()) + "\n" +
+		"Device producer: " + gcnew String(prevList[prevLisItemPosition(listBox1->SelectedIndex)].deviceProducer.c_str()) + "\n" +
+		"Logical space: " + Convert::ToString(prevList[prevLisItemPosition(listBox1->SelectedIndex)].totalLogicalSpace.QuadPart) + " bytes\n" +
+		"Free logical space: " + Convert::ToString(prevList[prevLisItemPosition(listBox1->SelectedIndex)].freeLogicalSpace.QuadPart) + " bytes\n" +
+		"Used logical space: " + Convert::ToString(prevList[prevLisItemPosition(listBox1->SelectedIndex)].usedLogicalSpace.QuadPart) + " bytes\n" +
+		"Drive letter: " + Char(prevList[prevLisItemPosition(listBox1->SelectedIndex)].driveLetter)
+	);
 		 }
-private: System::Void button5_Click(System::Object^ sender, System::EventArgs^ e) { // вывести инфформацию о винчестере 
+private: System::Void button5_Click(System::Object^ sender, System::EventArgs^ e) { // РІС‹РІРµСЃС‚Рё РёРЅС„С„РѕСЂРјР°С†РёСЋ Рѕ РІРёРЅС‡РµСЃС‚РµСЂРµ 
 			System::Windows::Forms::MessageBox::Show("Physical space: " + 
 				Convert::ToString(storageList[listBox2->SelectedIndex].totalPhysicalSpace.QuadPart) + " bytes\n" + 
 				"Logical space: " + Convert::ToString(storageList[listBox2->SelectedIndex].totalLogicalSpace.QuadPart) + " bytes\n" + 
 				"Free logical space: " + Convert::ToString(storageList[listBox2->SelectedIndex].freeLogicalSpace.QuadPart) + " bytes\n" + 
 				"Used logical space: " + Convert::ToString(storageList[listBox2->SelectedIndex].usedLogicalSpace.QuadPart) + " bytes\n" + 
 				"Interface: " + gcnew String(storageList[listBox2->SelectedIndex].connectingInterface.c_str()) + 
-				"ATA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata \n") ? "1" : "1-7") + "\n" + 
+				//"ATA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata \n") ? "1" : "1-7") + "\n" + 
 				"Firmware: " + gcnew String(storageList[listBox2->SelectedIndex].firmware) + "\n" + 
 				"Serial Number: " + gcnew String(storageList[listBox2->SelectedIndex].serialNumber) + "\n" + 
 				"Version: " + gcnew String(storageList[listBox2->SelectedIndex].version) + "\n" + 
-				"Using DMA: " + (storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Sata \n") && storageList[listBox2->SelectedIndex].connectingInterface.compare("Bus Type Ata \n") ? "False" : addingDMA()) + "\n" + 
-				"Using PIO: " + addingPIO(storageList[listBox2->SelectedIndex].usingPIO) 
+				gcnew String(storageList[listBox2->SelectedIndex].capabilities.c_str())
 ); 
 } 
 
-System::String^ addingPIO(bool adding) 
-{ 
-	if (!adding) 
-		return "False"; 
-	else 
-	return gcnew String("PIO Mode 0\n" + "PIO Mode 1\n" + "PIO Mode 2\n" + "PIO Mode 3\n" + "PIO Mode 4\n"); 
-} 
-
-String^ addingDMA() 
-{ 
-	return gcnew String("SW DMA Mode 0\n" + "SW DMA Mode 1\n" + "SW DMA Mode 2\n" + "MW DMA Mode 0\n" + "MW DMA Mode 1\n" + "MW DMA Mode 2\n" + 
-"UDMA Mode 0\n" + "UDMA Mode 1\n" + "UDMA Mode 2\n" + "UDMA Mode 3\n" + "UDMA Mode 4\n" + "UDMA Mode 5\n" + "UDMA Mode 6\n"); 
-}
+		 int prevLisItemPosition(int toFind)
+		 {
+			 for (int i = 0; i < prevList.size(); i++)
+				 if (prevList[i].deviceNumber == toFind)
+					 return i;
+			 return 0;
+		 }
 		
-private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e) {	//остановить или запустить сканирование
+private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e) {	//РѕСЃС‚Р°РЅРѕРІРёС‚СЊ РёР»Рё Р·Р°РїСѓСЃС‚РёС‚СЊ СЃРєР°РЅРёСЂРѕРІР°РЅРёРµ
 			 scanPaused = !scanPaused;
 			 button4->BackColor = scanPaused?Color::Red:Color::Green;
 			 if (scanPaused) timer1->Stop();

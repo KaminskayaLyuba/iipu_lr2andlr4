@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include <cfgmgr32.h>
 #include <SetupAPI.h>
+#include <WinIoCtl.h>
+#include <ntddscsi.h>
 #include <vector>
 #include <string>
 #include <Usbioctl.h>
@@ -9,7 +11,11 @@
 #include <Usbiodef.h>
 #include <fstream>
 #pragma comment(lib, "setupapi.lib")
+#pragma comment(lib, "Advapi32.lib")
 using namespace std;
+
+
+#define BYTE_SIZE 8
 
 bool scanPaused = false;																	//флаг остановки/запуска сканирования
 int ejectCount = 3;																			//количество попыток отключения 
@@ -58,6 +64,7 @@ public:
 	ATL::CString firmware;																	//версия прошивки
 	std::string connectingInterface;														//интерфейс
 	bool usingPIO;																			//использование PIO
+	std::string capabilities;
 };
 
 //
@@ -128,6 +135,7 @@ std::vector<DeviceInfo> GetUSBDevices()														//получение USB-устройств
 			info.freeLogicalSpace = zero;
 			info.totalLogicalSpace = zero;
 			info.usedLogicalSpace = zero;
+			info.deviceNumber = -1;
 			result.push_back(info);
 
 	}
@@ -238,6 +246,123 @@ string getBus(DWORD buffer)														//перевод типа интерфейса из числа в ст
 	}
 }
 
+void getAtaSupportStandarts(HANDLE diskHandle, StorageInfo &toSave) {
+
+	UCHAR identifyDataBuffer[512 + sizeof(ATA_PASS_THROUGH_EX)] = { 0 };
+
+	ATA_PASS_THROUGH_EX &PTE = *(ATA_PASS_THROUGH_EX *)identifyDataBuffer;
+	PTE.Length = sizeof(PTE);
+	PTE.TimeOutValue = 10;
+	PTE.DataTransferLength = 512;
+	PTE.DataBufferOffset = sizeof(ATA_PASS_THROUGH_EX);
+	PTE.AtaFlags = ATA_FLAGS_DATA_IN;
+
+	IDEREGS *ideRegs = (IDEREGS *)PTE.CurrentTaskFile;
+	ideRegs->bCommandReg = 0xEC;
+
+	if (!DeviceIoControl(diskHandle, IOCTL_ATA_PASS_THROUGH, &PTE, sizeof(identifyDataBuffer), &PTE, sizeof(identifyDataBuffer), NULL, NULL)) {
+		//cout << GetLastError() << std::endl;
+		//		return;
+		DWORD a = GetLastError();
+	}
+
+	WORD *data = (WORD *)(identifyDataBuffer + sizeof(ATA_PASS_THROUGH_EX));
+	short ataSupportByte = data[80];
+
+	WORD MDMA_supports = data[63];
+	toSave.capabilities.append("Multiword DMA supports: ");
+	if (MDMA_supports & 0x4)
+	{
+		toSave.capabilities.append("0 1 2\t");
+	}
+	else if (MDMA_supports & 0x2)
+	{
+		toSave.capabilities.append("0 1\t");
+	}
+	else if (MDMA_supports & 0x1)
+	{
+		toSave.capabilities.append(" 0\t");
+	}
+	else
+	{
+		toSave.capabilities.append("\t");
+	}
+
+	WORD UDMA_supports = data[88];
+
+	toSave.capabilities.append("Ultra DMA supports: ");
+	if (UDMA_supports & 0x40)
+	{
+		toSave.capabilities.append("0 1 2 3 4 5 6\t");
+	}
+	else if (UDMA_supports & 0x20)
+	{
+		toSave.capabilities.append("0 1 2 3 4 5\t");
+	}
+	else if (UDMA_supports & 0x10)
+	{
+		toSave.capabilities.append("0 1 2 3 4\t");
+	}
+	else if (UDMA_supports & 0x8)
+	{
+		toSave.capabilities.append("0 1 2 3\t");
+	}
+	else if (UDMA_supports & 0x4)
+	{
+		toSave.capabilities.append("0 1 2\t");
+	}
+	else if (UDMA_supports & 0x2)
+	{
+		toSave.capabilities.append("0 1\t");
+	}
+	else if (UDMA_supports & 0x1)
+	{
+		toSave.capabilities.append("0\t");
+	}
+	else
+	{
+		toSave.capabilities.append("\t");
+	}
+
+	WORD PIO_supports = data[64];
+
+	toSave.capabilities.append("PIO supports: ");
+	if (PIO_supports & 0x2)
+	{
+		toSave.capabilities.append("0 1 2 3 4\t");
+	}
+	else if (PIO_supports & 0x1)
+	{
+		toSave.capabilities.append("0 1 2 3\t");
+	}
+	else
+	{
+		toSave.capabilities.append("\t");
+	}
+
+	int i = 2 * BYTE_SIZE;
+	int bitArray[2 * BYTE_SIZE];
+	while (i--) {
+		bitArray[i] = ataSupportByte & 32768 ? 1 : 0;
+		ataSupportByte = ataSupportByte << 1;
+	}
+
+	toSave.capabilities.append("ATA Support:   ");
+	for (int i = 8; i >= 4; i--) {
+		if (bitArray[i] == 1) {
+			toSave.capabilities.append("ATA ");
+			char *ataV;
+			itoa(i, ataV, 10);
+			toSave.capabilities.append(ataV);
+			if (i != 4) {
+				toSave.capabilities.append(", ");
+			}
+		}
+	}
+	toSave.capabilities.append("\n");
+}
+
+
 //
 //функция получения запоминающих устройств
 //
@@ -298,9 +423,10 @@ std::vector<StorageInfo> getStorages()
 		long res = SetupDiGetInterfaceDeviceDetail(hDeinfo, &dataDeviceInterface, interfaceDetailData, sizeDeviceDetail, &sizeDeviceDetail, &infoData);	//получить детальную информацию об устройстве
 		if (res)
 		{
-			
+			StorageInfo currentStorage;															//записать считанную информацию
+
 			HANDLE hDrive = CreateFile(interfaceDetailData->DevicePath, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);		//получаю хендл на диск
-			
+			getAtaSupportStandarts(hDrive, currentStorage);
 			
 			DeviceIoControl(hDrive, IOCTL_STORAGE_QUERY_PROPERTY,								//полчаю размер данных об устройстве
 				&storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY),
@@ -364,8 +490,7 @@ std::vector<StorageInfo> getStorages()
 				disk = disk + 8;																//перейти к следующему диску
 			}
 
-			StorageInfo currentStorage;															//записать считанную информацию
-
+		
 			currentStorage.totalLogicalSpace = totalAllSpace;
 			currentStorage.totalPhysicalSpace = diskGeometry.DiskSize;
 			currentStorage.freeLogicalSpace = totalFreeSpace;
